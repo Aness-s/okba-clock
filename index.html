@@ -221,9 +221,10 @@
       position: absolute;
       left: 0;
       white-space: nowrap;
-      font-size: 2.4vh;
+      font-size: 2.8vh;
       font-weight: 600;
       color: #e74c3c;
+      font-variant-numeric: tabular-nums;
       display: none;
     }
 
@@ -771,7 +772,7 @@
       alertEl.style.transform = `translateX(${pos}px)`;
       alertEl.classList.add('visible');
 
-      const speed = 0.12; // pixels per ms
+      const speed = 0.15; // pixels per ms
       let lastTime = null;
 
       function step(timestamp) {
