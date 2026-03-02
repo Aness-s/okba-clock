@@ -219,8 +219,6 @@
 
     .change-alert {
       display: none;
-      position: absolute;
-      left: 0;
       white-space: nowrap;
       font-size: 2.4vh;
       font-weight: 600;
@@ -229,12 +227,12 @@
 
     .change-alert.visible {
       display: block;
-      animation: marquee var(--marquee-duration, 14s) linear forwards;
+      animation: marquee 12s linear;
     }
 
     @keyframes marquee {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(calc(-100% - 100vw)); }
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
     }
 
     /* ── Prayer Table ── */
@@ -759,11 +757,6 @@
       alertEl.classList.remove('visible');
       // Force reflow to restart animation
       void alertEl.offsetWidth;
-      // Scale duration to text length so it fully scrolls off
-      const textWidth = alertEl.scrollWidth;
-      const totalDistance = textWidth + window.innerWidth;
-      const speed = 200; // pixels per second
-      alertEl.style.setProperty('--marquee-duration', (totalDistance / speed) + 's');
       alertEl.classList.add('visible');
       bannerEl.classList.add('alert-active');
       bannerShowingAlert = true;
