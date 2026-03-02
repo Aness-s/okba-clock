@@ -191,9 +191,8 @@
     }
 
     .next-prayer-content.hidden {
-      opacity: 0;
+      visibility: hidden;
       pointer-events: none;
-      position: absolute;
     }
 
     .next-prayer-banner .label {
@@ -219,7 +218,7 @@
 
     .change-alert {
       position: absolute;
-      left: 0;
+      left: 100%;
       white-space: nowrap;
       font-size: 2.4vh;
       font-weight: 600;
@@ -765,12 +764,10 @@
       contentEl.classList.add('hidden');
       bannerEl.classList.add('alert-active');
 
-      // Show text immediately at position 0
       alertEl.style.transform = 'translateX(0)';
       alertEl.classList.add('visible');
 
-      // Start scrolling after a brief pause so text is readable
-      const speed = 0.08; // pixels per ms — slow and readable
+      const speed = 0.08; // pixels per ms
       let pos = 0;
       let lastTime = null;
 
@@ -780,21 +777,20 @@
         lastTime = timestamp;
         pos -= speed * dt;
 
-        const textWidth = alertEl.scrollWidth;
         alertEl.style.transform = `translateX(${pos}px)`;
 
-        // Once text has fully scrolled off the left edge
-        if (pos < -textWidth) {
+        // Text starts at left:100% (right edge of banner)
+        // It must travel bannerWidth + textWidth to fully exit left
+        const bannerWidth = bannerEl.offsetWidth;
+        const textWidth = alertEl.scrollWidth;
+        if (pos < -(bannerWidth + textWidth)) {
           showNextPrayerContent();
           return;
         }
         marqueeAnimId = requestAnimationFrame(step);
       }
 
-      // Small delay so text is visible before scrolling starts
-      setTimeout(() => {
-        marqueeAnimId = requestAnimationFrame(step);
-      }, 2000);
+      marqueeAnimId = requestAnimationFrame(step);
     }
 
     function setupChangeAlert() {
