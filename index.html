@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Okba Islamic Centre - Prayer Times</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg-primary: #0a1628;
+      --bg-card: rgba(255,255,255,0.04);
+      --bg-card-hover: rgba(255,255,255,0.07);
+      --accent: #c9a84c;
+      --accent-glow: rgba(201,168,76,0.3);
+      --text-primary: #f0ece4;
+      --text-secondary: rgba(240,236,228,0.6);
+      --text-muted: rgba(240,236,228,0.35);
+      --highlight-bg: rgba(201,168,76,0.12);
+      --highlight-border: rgba(201,168,76,0.5);
+      --border: rgba(255,255,255,0.06);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Subtle background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.05) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(30,80,140,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 1.2vh 3vw;
+      gap: 1vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      min-height: 19vh;
+    }
+
+    .mosque-logo {
+      position: absolute;
+      left: 0;
+      height: 18vh;
+      width: auto;
+    }
+
+    .header-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3vh;
+    }
+
+    .mosque-name h1 {
+      font-size: 3.2vh;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .clock-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .clock {
+      font-size: 9vh;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .clock .seconds {
+      font-size: 5vh;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+
+    .clock .ampm {
+      font-size: 2.8vh;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 0.5vw;
+    }
+
+    .date-section {
+      position: absolute;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.3vh;
+    }
+
+    .gregorian-date {
+      font-size: 2.4vh;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .hijri-date {
+      font-size: 2.2vh;
+      font-weight: 400;
+      color: var(--accent);
+      font-family: 'Amiri', serif;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), var(--accent-glow), var(--border), transparent);
+      flex-shrink: 0;
+    }
+
+    /* ── Next Prayer Banner ── */
+    .next-prayer-banner {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.8vh 2vw;
+      background: var(--highlight-bg);
+      border: 1px solid var(--highlight-border);
+      border-radius: 0.8vh;
+      flex-shrink: 0;
+      overflow: hidden;
+      transition: border-color 0.5s ease, background 0.5s ease;
+    }
+
+    .next-prayer-banner.alert-active {
+      border-color: rgba(231,76,60,0.6);
+      background: rgba(231,76,60,0.08);
+    }
+
+    .next-prayer-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2vw;
+      transition: opacity 0.4s ease;
+    }
+
+    .next-prayer-content.hidden {
+      opacity: 0;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .next-prayer-banner .label {
+      font-size: 2.2vh;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .next-prayer-banner .prayer-name {
+      font-size: 3vh;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .next-prayer-banner .countdown {
+      font-size: 2.8vh;
+      font-weight: 600;
+      color: var(--text-primary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .change-alert {
+      display: none;
+      white-space: nowrap;
+      font-size: 2.4vh;
+      font-weight: 600;
+      color: #e74c3c;
+    }
+
+    .change-alert.visible {
+      display: block;
+      animation: marquee 12s linear;
+    }
+
+    @keyframes marquee {
+      0%   { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+
+    /* ── Prayer Table ── */
+    .prayer-grid {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5vh;
+      min-height: 0;
+    }
+
+    .prayer-grid-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      padding: 0.4vh 2vw;
+      gap: 1vw;
+      flex-shrink: 0;
+    }
+
+    .prayer-grid-header span {
+      font-size: 2vh;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+    }
+
+    .prayer-grid-header span:not(:first-child) {
+      text-align: center;
+    }
+
+    .prayer-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      align-items: center;
+      padding: 0 2vw;
+      gap: 1vw;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 0.8vh;
+      transition: all 0.4s ease;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .prayer-row.active {
+      background: var(--highlight-bg);
+      border-color: var(--highlight-border);
+      box-shadow: 0 0 20px rgba(201,168,76,0.08);
+    }
+
+    .prayer-row.sunrise-row {
+      grid-template-columns: 1fr 2fr;
+    }
+
+    .prayer-info {
+      display: flex;
+      align-items: center;
+      gap: 0.8vw;
+    }
+
+    .prayer-icon {
+      width: 4vh;
+      height: 4vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      flex-shrink: 0;
+    }
+
+    .prayer-row.active .prayer-icon {
+      background: rgba(201,168,76,0.15);
+    }
+
+    .prayer-icon svg {
+      width: 2.6vh;
+      height: 2.6vh;
+      fill: var(--accent);
+    }
+
+    .prayer-names {
+      display: flex;
+      flex-direction: column;
+      gap: 0.1vh;
+    }
+
+    .prayer-name-en {
+      font-size: 2.8vh;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .prayer-row.active .prayer-name-en {
+      color: var(--accent);
+    }
+
+    .prayer-name-ar {
+      font-family: 'Amiri', serif;
+      font-size: 2.2vh;
+      color: var(--text-secondary);
+    }
+
+    .prayer-time {
+      text-align: center;
+      font-size: 3.4vh;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-primary);
+    }
+
+    .prayer-row.active .prayer-time {
+      color: var(--accent);
+    }
+
+    .prayer-time.sunrise-time {
+      text-align: center;
+    }
+
+    .prayer-time-label {
+      font-size: 1.2vh;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 0.2vh;
+    }
+
+    /* Jumu'ah row special */
+    .prayer-row.jumuah-row {
+      border-style: dashed;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      flex-shrink: 0;
+      text-align: center;
+      padding: 0.5vh 0;
+      font-size: 1.3vh;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+
+    /* Pulse animation for active row indicator */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .active-indicator {
+      width: 0.5vw;
+      height: 0.5vw;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+      margin-right: 0.5vw;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <img src="OkbaLogo_no_TEXT.svg" alt="Okba Islamic Centre" class="mosque-logo">
+      <div class="header-center">
+        <div class="mosque-name">
+          <h1>Okba Islamic Centre</h1>
+        </div>
+        <div class="clock-section">
+          <div class="clock" id="clock"></div>
+        </div>
+      </div>
+      <div class="date-section">
+        <div class="gregorian-date" id="gregorianDate"></div>
+        <div class="hijri-date" id="hijriDate"></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Next Prayer Banner -->
+    <div class="next-prayer-banner" id="nextPrayerBanner">
+      <div class="next-prayer-content" id="nextPrayerContent">
+        <span class="label">Next Prayer</span>
+        <span class="prayer-name" id="nextPrayerName">—</span>
+        <span class="countdown" id="nextPrayerCountdown">—</span>
+      </div>
+      <div class="change-alert" id="changeAlert"></div>
+    </div>
+
+    <!-- Prayer Grid -->
+    <div class="prayer-grid">
+      <div class="prayer-grid-header">
+        <span>Salah</span>
+        <span>Begins</span>
+        <span>Iqamah</span>
+      </div>
+
+      <div class="prayer-row" id="row-fajr">
+        <div class="prayer-info">
+          <div class="prayer-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" style="fill:none"/><path d="M20 15.31L23.31 12 20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69zM12 18V6c3.31 0 6 2.69 6 6s-2.69 6-6 6z"/></svg>
+          </div>
+          <div class="prayer-names">
+            <div class="prayer-name-en">Fajr</div>
+            <div class="prayer-name-ar">الفجر</div>
+          </div>
+        </div>
+        <div><div class="prayer-time" id="fajr-start">—</div></div>
+        <div><div class="prayer-time" id="fajr-iqama">—</div></div>
+      </div>
+
+      <div class="prayer-row sunrise-row" id="row-sunrise">
+        <div class="prayer-info">
+          <div class="prayer-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 18h18v2H3v-2zm0-4h2v2H3v-2zm4 0h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM12 6l-4 4h3v4h2v-4h3L12 6z" style="fill:none"/><path d="M12 2L6.5 7.5h3V12h5V7.5h3L12 2zM3 16h2v2H3v-2zm4 0h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zM3 20h18v2H3v-2z" style="fill:none"/><path d="M3 18h18v-2H3v2zm9-16L6.5 7.5h3V12h5V7.5h3L12 2z"/></svg>
+          </div>
+          <div class="prayer-names">
+            <div class="prayer-name-en">Sunrise</div>
+            <div class="prayer-name-ar">الشروق</div>
+          </div>
+        </div>
+        <div><div class="prayer-time sunrise-time" id="sunrise-start">—</div></div>
+      </div>
+
+      <div class="prayer-row" id="row-dhuhr">
+        <div class="prayer-info">
+          <div class="prayer-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/></svg>
+          </div>
+          <div class="prayer-names">
+            <div class="prayer-name-en">Dhuhr</div>
+            <div class="prayer-name-ar">الظهر</div>
+          </div>
+        </div>
+        <div><div class="prayer-time" id="dhuhr-start">—</div></div>
+        <div><div class="prayer-time" id="dhuhr-iqama">—</div></div>
+      </div>
+
+      <div class="prayer-row" id="row-asr">
+        <div class="prayer-info">
+          <div class="prayer-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1z"/></svg>
+          </div>
+          <div class="prayer-names">
+            <div class="prayer-name-en">Asr</div>
+            <div class="prayer-name-ar">العصر</div>
+          </div>
+        </div>
+        <div><div class="prayer-time" id="asr-start">—</div></div>
+        <div><div class="prayer-time" id="asr-iqama">—</div></div>
+      </div>
+
+      <div class="prayer-row" id="row-maghrib">
+        <div class="prayer-info">
+          <div class="prayer-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zm-2 5.79V18h-3.52L12 20.48 9.52 18H6v-3.52L3.52 12 6 9.52V6h3.52L12 3.52 14.48 6H18v3.52L20.48 12 18 14.48zM12 6.5c-3.03 0-5.5 2.47-5.5 5.5s2.47 5.5 5.5 5.5 5.5-2.47 5.5-5.5-2.47-5.5-5.5-5.5z"/></svg>
+          </div>
+          <div class="prayer-names">
+            <div class="prayer-name-en">Maghrib</div>
+            <div class="prayer-name-ar">المغرب</div>
+          </div>
+        </div>
+        <div><div class="prayer-time" id="maghrib-start">—</div></div>
+        <div><div class="prayer-time" id="maghrib-iqama">—</div></div>
+      </div>
+
+      <div class="prayer-row" id="row-isha">
+        <div class="prayer-info">
+          <div class="prayer-icon">
+            <svg viewBox="0 0 24 24"><path d="M12.43 2.3c-2.38-.59-4.68-.27-6.63.64-.35.16-.41.64-.1.86C8.3 5.6 9.67 8.5 9.08 11.58c-.6 3.15-3.07 5.42-6.04 5.93-.39.07-.56.51-.31.81C4.62 20.64 7.39 22 10.55 22c4.98 0 8.91-4.37 8.32-9.48-.46-3.97-3.58-7.16-6.44-10.22z" style="fill:none"/><path d="M9.5 2c-1.82 0-3.53.5-5 1.35 2.99 1.73 5 4.95 5 8.65s-2.01 6.92-5 8.65C5.97 21.5 7.68 22 9.5 22c5.52 0 10-4.48 10-10S15.02 2 9.5 2z"/></svg>
+          </div>
+          <div class="prayer-names">
+            <div class="prayer-name-en">Isha</div>
+            <div class="prayer-name-ar">العشاء</div>
+          </div>
+        </div>
+        <div><div class="prayer-time" id="isha-start">—</div></div>
+        <div><div class="prayer-time" id="isha-iqama">—</div></div>
+      </div>
+
+      <div class="prayer-row jumuah-row" id="row-jumuah">
+        <div class="prayer-info">
+          <div class="prayer-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C11.2 2 10.5 2.7 10.5 3.5V4.6C9.4 5 8.5 5.9 8 7H5L3 9V11H5V20H3V22H21V20H19V11H21V9L19 7H16C15.5 5.9 14.6 5 13.5 4.6V3.5C13.5 2.7 12.8 2 12 2ZM12 4C12.3 4 12.5 4.2 12.5 4.5V5H11.5V4.5C11.5 4.2 11.7 4 12 4ZM12 6C13.1 6 14 6.9 14 8C14 9.1 13.1 10 12 10C10.9 10 10 9.1 10 8C10 6.9 10.9 6 12 6ZM7 9H9.1C9.5 10.2 10.6 11 12 11C13.4 11 14.5 10.2 14.9 9H17L18 10V11H6V10L7 9ZM7 13H17V20H15V16H13V20H11V16H9V20H7V13Z"/></svg>
+          </div>
+          <div class="prayer-names">
+            <div class="prayer-name-en">Jumu'ah</div>
+            <div class="prayer-name-ar">الجمعة</div>
+          </div>
+        </div>
+        <div><div class="prayer-time" id="jumuah-start">—</div></div>
+        <div><div class="prayer-time" id="jumuah-iqama">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let prayerData = [];
+
+    // Load prayer times data
+    fetch('prayer_times.json')
+      .then(r => r.json())
+      .then(data => {
+        prayerData = data;
+        updateDisplay();
+        setupChangeAlert();
+      })
+      .catch(err => console.error('Failed to load prayer times:', err));
+
+    // Format time from 24h "HH:MM" to 12h display
+    function formatTime12(timeStr) {
+      if (!timeStr) return '—';
+      const [h, m] = timeStr.split(':').map(Number);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hour12 = h % 12 || 12;
+      return `${hour12}:${m.toString().padStart(2, '0')} ${ampm}`;
+    }
+
+    // Parse "HH:MM" to today's Date object
+    function parseTimeToday(timeStr) {
+      if (!timeStr) return null;
+      const [h, m] = timeStr.split(':').map(Number);
+      const now = new Date();
+      return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+    }
+
+    function formatDateStr(date) {
+      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    }
+
+    function getDisplayData() {
+      const now = new Date();
+      const todayStr = formatDateStr(now);
+      const todayData = prayerData.find(d => d.date === todayStr);
+
+      // After Isha iqama + 15 min, switch to tomorrow's times
+      if (todayData && todayData.ishaIqama) {
+        const ishaIqamaDate = parseTimeToday(todayData.ishaIqama);
+        if (ishaIqamaDate) {
+          ishaIqamaDate.setMinutes(ishaIqamaDate.getMinutes() + 10);
+          if (now >= ishaIqamaDate) {
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowStr = formatDateStr(tomorrow);
+            const tomorrowData = prayerData.find(d => d.date === tomorrowStr);
+            if (tomorrowData) return tomorrowData;
+          }
+        }
+      }
+
+      return todayData;
+    }
+
+    function updateClock() {
+      const now = new Date();
+      let h = now.getHours();
+      const m = now.getMinutes();
+      const s = now.getSeconds();
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      document.getElementById('clock').innerHTML =
+        `${h}:${String(m).padStart(2,'0')}<span class="seconds">:${String(s).padStart(2,'0')}</span> <span class="ampm">${ampm}</span>`;
+    }
+
+    function updateDate() {
+      const now = new Date();
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      document.getElementById('gregorianDate').textContent = now.toLocaleDateString('en-US', options);
+
+      // Hijri date using Intl
+      try {
+        const hijriFormatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+        const hijriArFormatter = new Intl.DateTimeFormat('ar-u-ca-islamic-umalqura', {
+          day: 'numeric', month: 'long', year: 'numeric'
+        });
+        document.getElementById('hijriDate').textContent =
+          hijriFormatter.format(now) + '  ·  ' + hijriArFormatter.format(now);
+      } catch(e) {
+        document.getElementById('hijriDate').textContent = '';
+      }
+    }
+
+    function updateDisplay() {
+      const data = getDisplayData();
+      if (!data) {
+        console.warn('No prayer data for today');
+        return;
+      }
+
+      // Set prayer times
+      document.getElementById('fajr-start').textContent = formatTime12(data.fajrStart);
+      document.getElementById('fajr-iqama').textContent = formatTime12(data.fajrIqama);
+      document.getElementById('sunrise-start').textContent = formatTime12(data.sunrise);
+      document.getElementById('dhuhr-start').textContent = formatTime12(data.zuhrStart);
+      document.getElementById('dhuhr-iqama').textContent = formatTime12(data.zuhrIqama);
+      document.getElementById('asr-start').textContent = formatTime12(data.asrStart);
+      document.getElementById('asr-iqama').textContent = formatTime12(data.asrIqama);
+      document.getElementById('maghrib-start').textContent = formatTime12(data.maghribStart);
+      document.getElementById('maghrib-iqama').textContent = formatTime12(data.maghribIqama);
+      document.getElementById('isha-start').textContent = formatTime12(data.ishaStart);
+      document.getElementById('isha-iqama').textContent = formatTime12(data.ishaIqama);
+      document.getElementById('jumuah-start').textContent = formatTime12(data.zuhrStart);
+      document.getElementById('jumuah-iqama').textContent = formatTime12(data.jummah1);
+
+      // Jumu'ah row always visible
+      document.getElementById('row-jumuah').style.display = '';
+
+      updateNextPrayer(data);
+    }
+
+    function updateNextPrayer(data) {
+      const now = new Date();
+      const prayers = [
+        { key: 'fajr', name: 'Fajr', time: data.fajrStart, iqama: data.fajrIqama },
+        { key: 'dhuhr', name: 'Dhuhr', time: data.zuhrStart, iqama: data.zuhrIqama },
+        { key: 'asr', name: 'Asr', time: data.asrStart, iqama: data.asrIqama },
+        { key: 'maghrib', name: 'Maghrib', time: data.maghribStart, iqama: data.maghribIqama },
+        { key: 'isha', name: 'Isha', time: data.ishaStart, iqama: data.ishaIqama },
+      ];
+
+      // Clear all active states
+      document.querySelectorAll('.prayer-row').forEach(r => r.classList.remove('active'));
+
+      let nextPrayer = null;
+      for (const p of prayers) {
+        const iqamaTime = parseTimeToday(p.iqama);
+        if (iqamaTime && iqamaTime > now) {
+          nextPrayer = p;
+          break;
+        }
+      }
+
+      if (!nextPrayer) {
+        // All prayers passed — next is tomorrow's Fajr
+        document.getElementById('nextPrayerName').textContent = 'Fajr';
+        const tomorrowFajr = parseTimeToday(data.fajrIqama);
+        tomorrowFajr.setDate(tomorrowFajr.getDate() + 1);
+        const diff = tomorrowFajr - now;
+        document.getElementById('nextPrayerCountdown').textContent = formatCountdown(diff);
+        document.getElementById('row-fajr').classList.add('active');
+      } else {
+        document.getElementById('nextPrayerName').textContent = nextPrayer.name;
+        const iqamaTime = parseTimeToday(nextPrayer.iqama);
+        const diff = iqamaTime - now;
+        document.getElementById('nextPrayerCountdown').textContent = formatCountdown(diff);
+        document.getElementById(`row-${nextPrayer.key}`).classList.add('active');
+      }
+    }
+
+    function formatCountdown(ms) {
+      if (ms < 0) return '—';
+      const totalMin = Math.floor(ms / 60000);
+      const hours = Math.floor(totalMin / 60);
+      const mins = totalMin % 60;
+      if (hours > 0) {
+        return `${hours}h ${mins}m remaining`;
+      }
+      return `${mins}m remaining`;
+    }
+
+    // Detect iqama time changes between today and tomorrow
+    function getIqamaChanges() {
+      const now = new Date();
+      const todayStr = formatDateStr(now);
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = formatDateStr(tomorrow);
+
+      const todayData = prayerData.find(d => d.date === todayStr);
+      const tomorrowData = prayerData.find(d => d.date === tomorrowStr);
+
+      if (!todayData || !tomorrowData) return [];
+
+      const fields = [
+        { key: 'fajrIqama', name: 'Fajr' },
+        { key: 'zuhrIqama', name: 'Dhuhr' },
+        { key: 'asrIqama', name: 'Asr' },
+        { key: 'ishaIqama', name: 'Isha' },
+      ];
+
+      const changes = [];
+      for (const f of fields) {
+        if (todayData[f.key] !== tomorrowData[f.key]) {
+          changes.push({ name: f.name, newTime: formatTime12(tomorrowData[f.key]) });
+        }
+      }
+      return changes;
+    }
+
+    // Banner toggle state
+    let bannerShowingAlert = false;
+    let bannerToggleTimeout = null;
+    let bannerAlertActive = false;
+
+    function showNextPrayerContent() {
+      const alertEl = document.getElementById('changeAlert');
+      const contentEl = document.getElementById('nextPrayerContent');
+      const bannerEl = document.getElementById('nextPrayerBanner');
+
+      alertEl.classList.remove('visible');
+      contentEl.classList.remove('hidden');
+      bannerEl.classList.remove('alert-active');
+      bannerShowingAlert = false;
+
+      // Show next prayer for 8s, then show alert again
+      if (bannerAlertActive) {
+        bannerToggleTimeout = setTimeout(showChangeAlert, 20000);
+      }
+    }
+
+    function showChangeAlert() {
+      const alertEl = document.getElementById('changeAlert');
+      const contentEl = document.getElementById('nextPrayerContent');
+      const bannerEl = document.getElementById('nextPrayerBanner');
+
+      contentEl.classList.add('hidden');
+      alertEl.classList.remove('visible');
+      // Force reflow to restart animation
+      void alertEl.offsetWidth;
+      alertEl.classList.add('visible');
+      bannerEl.classList.add('alert-active');
+      bannerShowingAlert = true;
+    }
+
+    function setupChangeAlert() {
+      const changes = getIqamaChanges();
+      const alertEl = document.getElementById('changeAlert');
+      const contentEl = document.getElementById('nextPrayerContent');
+      const bannerEl = document.getElementById('nextPrayerBanner');
+
+      if (changes.length === 0) {
+        // No changes — always show next prayer, stop toggling
+        alertEl.classList.remove('visible');
+        contentEl.classList.remove('hidden');
+        bannerEl.classList.remove('alert-active');
+        if (bannerToggleTimeout) {
+          clearTimeout(bannerToggleTimeout);
+          bannerToggleTimeout = null;
+        }
+        bannerAlertActive = false;
+        bannerShowingAlert = false;
+        return;
+      }
+
+      // Build change message
+      const parts = changes.map(c => `${c.name} Iqama at ${c.newTime}`);
+      alertEl.textContent = 'From tomorrow:  ' + parts.join('   ·   ');
+
+      // Listen for animation end to switch back to next prayer
+      if (!bannerAlertActive) {
+        bannerAlertActive = true;
+        alertEl.addEventListener('animationend', showNextPrayerContent);
+        // Start the first cycle after 8s
+        bannerToggleTimeout = setTimeout(showChangeAlert, 20000);
+      }
+    }
+
+    // Initial setup
+    updateClock();
+    updateDate();
+
+    // Update clock every second
+    setInterval(updateClock, 1000);
+
+    // Update prayer times and next prayer every 30 seconds
+    setInterval(() => {
+      updateDisplay();
+      updateDate();
+      setupChangeAlert();
+    }, 30000);
+  </script>
+</body>
+</html>
