@@ -815,7 +815,7 @@
         return;
       }
 
-      const parts = changes.map(c => `${c.name} Iqama at ${c.newTime}`);
+      const parts = changes.map(c => `${c.name} Iqama will be at ${c.newTime}`);
       alertEl.textContent = 'From tomorrow:  ' + parts.join('   ·   ');
 
       if (!bannerAlertActive) {
