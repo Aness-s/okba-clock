@@ -224,17 +224,11 @@
       font-size: 2.4vh;
       font-weight: 600;
       color: #e74c3c;
-      visibility: hidden;
+      display: none;
     }
 
     .change-alert.visible {
-      visibility: visible;
-      animation: marquee var(--marquee-duration, 14s) linear forwards;
-    }
-
-    @keyframes marquee {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(var(--marquee-distance)); }
+      display: block;
     }
 
     /* ── Prayer Table ── */
@@ -730,45 +724,77 @@
     }
 
     // Banner toggle state
-    let bannerShowingAlert = false;
-    let bannerToggleTimeout = null;
     let bannerAlertActive = false;
+    let bannerToggleTimeout = null;
+    let marqueeAnimId = null;
+
+    function stopMarquee() {
+      if (marqueeAnimId) {
+        cancelAnimationFrame(marqueeAnimId);
+        marqueeAnimId = null;
+      }
+    }
 
     function showNextPrayerContent() {
+      stopMarquee();
       const alertEl = document.getElementById('changeAlert');
       const contentEl = document.getElementById('nextPrayerContent');
       const bannerEl = document.getElementById('nextPrayerBanner');
 
       alertEl.classList.remove('visible');
+      alertEl.style.transform = '';
       contentEl.classList.remove('hidden');
       bannerEl.classList.remove('alert-active');
-      bannerShowingAlert = false;
 
-      // Show next prayer for 8s, then show alert again
       if (bannerAlertActive) {
         bannerToggleTimeout = setTimeout(showChangeAlert, 20000);
       }
     }
 
     function showChangeAlert() {
+      stopMarquee();
+      if (bannerToggleTimeout) {
+        clearTimeout(bannerToggleTimeout);
+        bannerToggleTimeout = null;
+      }
+
       const alertEl = document.getElementById('changeAlert');
       const contentEl = document.getElementById('nextPrayerContent');
       const bannerEl = document.getElementById('nextPrayerBanner');
 
       contentEl.classList.add('hidden');
-      alertEl.classList.remove('visible');
       bannerEl.classList.add('alert-active');
-      // Force reflow so scrollWidth is accurate
-      void alertEl.offsetWidth;
-      const textWidth = alertEl.scrollWidth;
-      const bannerWidth = bannerEl.offsetWidth;
-      // Text needs to move its own width + banner width to fully leave
-      const totalDistance = textWidth + bannerWidth;
-      const speed = 150; // pixels per second
-      alertEl.style.setProperty('--marquee-distance', (-totalDistance) + 'px');
-      alertEl.style.setProperty('--marquee-duration', (totalDistance / speed) + 's');
+
+      // Show text immediately at position 0
+      alertEl.style.transform = 'translateX(0)';
       alertEl.classList.add('visible');
-      bannerShowingAlert = true;
+
+      // Start scrolling after a brief pause so text is readable
+      const speed = 0.08; // pixels per ms — slow and readable
+      let pos = 0;
+      let lastTime = null;
+
+      function step(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const dt = timestamp - lastTime;
+        lastTime = timestamp;
+        pos -= speed * dt;
+
+        const textWidth = alertEl.scrollWidth;
+        alertEl.style.transform = `translateX(${pos}px)`;
+
+        // Once text has fully scrolled off the left edge
+        if (pos < -textWidth) {
+          showNextPrayerContent();
+          return;
+        }
+        marqueeAnimId = requestAnimationFrame(step);
+      }
+
+      // Small delay so text is visible before scrolling starts
+      setTimeout(() => {
+        marqueeAnimId = requestAnimationFrame(step);
+      }, 2000);
     }
 
     function setupChangeAlert() {
@@ -778,8 +804,9 @@
       const bannerEl = document.getElementById('nextPrayerBanner');
 
       if (changes.length === 0) {
-        // No changes — always show next prayer, stop toggling
+        stopMarquee();
         alertEl.classList.remove('visible');
+        alertEl.style.transform = '';
         contentEl.classList.remove('hidden');
         bannerEl.classList.remove('alert-active');
         if (bannerToggleTimeout) {
@@ -787,19 +814,14 @@
           bannerToggleTimeout = null;
         }
         bannerAlertActive = false;
-        bannerShowingAlert = false;
         return;
       }
 
-      // Build change message
       const parts = changes.map(c => `${c.name} Iqama at ${c.newTime}`);
       alertEl.textContent = 'From tomorrow:  ' + parts.join('   ·   ');
 
-      // Listen for animation end to switch back to next prayer
       if (!bannerAlertActive) {
         bannerAlertActive = true;
-        alertEl.addEventListener('animationend', showNextPrayerContent);
-        // Show alert immediately on first detection
         showChangeAlert();
       }
     }
