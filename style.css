@@ -1,0 +1,383 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Amiri:wght@400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg-primary: #0a1628;
+  --bg-card: rgba(255,255,255,0.04);
+  --bg-card-hover: rgba(255,255,255,0.07);
+  --accent: #c9a84c;
+  --accent-glow: rgba(201,168,76,0.3);
+  --text-primary: #f0ece4;
+  --text-secondary: rgba(240,236,228,0.6);
+  --text-muted: rgba(240,236,228,0.35);
+  --highlight-bg: rgba(201,168,76,0.12);
+  --highlight-border: rgba(201,168,76,0.5);
+  --border: rgba(255,255,255,0.06);
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Subtle background pattern */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(201,168,76,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(30,80,140,0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 1.2vh 3vw;
+  gap: 1vh;
+}
+
+/* ── Header ── */
+.header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-height: 19vh;
+}
+
+.mosque-logo {
+  position: absolute;
+  left: 0;
+  height: 18vh;
+  width: auto;
+}
+
+#fullscreen-btn {
+  position: fixed;
+  top: 1vh;
+  right: 1vw;
+  z-index: 999;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 1.4vh;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+#fullscreen-btn:hover, #fullscreen-btn:focus {
+  opacity: 1;
+}
+
+.header-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3vh;
+}
+
+.mosque-name h1 {
+  font-size: 3.2vh;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.clock-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.clock {
+  font-size: 9vh;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.clock .seconds {
+  font-size: 5vh;
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.clock .ampm {
+  font-size: 2.8vh;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 0.5vw;
+}
+
+.date-section {
+  position: absolute;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3vh;
+}
+
+.gregorian-date {
+  font-size: 2.4vh;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.hijri-date {
+  font-size: 2.2vh;
+  font-weight: 400;
+  color: var(--accent);
+  font-family: 'Amiri', serif;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), var(--accent-glow), var(--border), transparent);
+  flex-shrink: 0;
+}
+
+/* ── Next Prayer Banner ── */
+.next-prayer-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.8vh 2vw;
+  background: var(--highlight-bg);
+  border: 1px solid var(--highlight-border);
+  border-radius: 0.8vh;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: border-color 0.5s ease, background 0.5s ease;
+}
+
+.next-prayer-banner.alert-active {
+  border-color: rgba(231,76,60,0.6);
+  background: rgba(231,76,60,0.08);
+}
+
+.next-prayer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2vw;
+  transition: opacity 0.4s ease;
+}
+
+.next-prayer-content.hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.next-prayer-banner .label {
+  font-size: 2.2vh;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.next-prayer-banner .prayer-name {
+  font-size: 3vh;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.next-prayer-banner .countdown {
+  font-size: 2.8vh;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.change-alert {
+  position: absolute;
+  left: 0;
+  white-space: nowrap;
+  font-size: 2.8vh;
+  font-weight: 600;
+  color: #e74c3c;
+  font-variant-numeric: tabular-nums;
+  display: none;
+}
+
+.change-alert.visible {
+  display: block;
+}
+
+/* ── Prayer Table ── */
+.prayer-grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5vh;
+  min-height: 0;
+}
+
+.prayer-grid-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 0.4vh 2vw;
+  gap: 1vw;
+  flex-shrink: 0;
+}
+
+.prayer-grid-header span {
+  font-size: 2vh;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+}
+
+.prayer-grid-header span:not(:first-child) {
+  text-align: center;
+}
+
+.prayer-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  align-items: center;
+  padding: 0 2vw;
+  gap: 1vw;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 0.8vh;
+  transition: all 0.4s ease;
+  flex: 1;
+  min-height: 0;
+}
+
+.prayer-row.active {
+  background: var(--highlight-bg);
+  border-color: var(--highlight-border);
+  box-shadow: 0 0 20px rgba(201,168,76,0.08);
+}
+
+.prayer-row.sunrise-row {
+  grid-template-columns: 1fr 2fr;
+}
+
+.prayer-info {
+  display: flex;
+  align-items: center;
+  gap: 0.8vw;
+}
+
+.prayer-icon {
+  width: 4vh;
+  height: 4vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+  flex-shrink: 0;
+}
+
+.prayer-row.active .prayer-icon {
+  background: rgba(201,168,76,0.15);
+}
+
+.prayer-icon svg {
+  width: 2.6vh;
+  height: 2.6vh;
+  fill: var(--accent);
+}
+
+.prayer-names {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1vh;
+}
+
+.prayer-name-en {
+  font-size: 2.8vh;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.prayer-row.active .prayer-name-en {
+  color: var(--accent);
+}
+
+.prayer-name-ar {
+  font-family: 'Amiri', serif;
+  font-size: 2.2vh;
+  color: var(--text-secondary);
+}
+
+.prayer-time {
+  text-align: center;
+  font-size: 3.4vh;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-primary);
+}
+
+.prayer-row.active .prayer-time {
+  color: var(--accent);
+}
+
+.prayer-time.sunrise-time {
+  text-align: center;
+}
+
+.prayer-time-label {
+  font-size: 1.2vh;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-align: center;
+  margin-top: 0.2vh;
+}
+
+/* Jumu'ah row special */
+.prayer-row.jumuah-row {
+  border-style: dashed;
+}
+
+/* ── Footer ── */
+.footer {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 0.5vh 0;
+  font-size: 1.3vh;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* Pulse animation for active row indicator */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.active-indicator {
+  width: 0.5vw;
+  height: 0.5vw;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+  margin-right: 0.5vw;
+}
