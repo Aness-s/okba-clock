@@ -760,7 +760,7 @@
       // Scale duration to text length so it fully scrolls off
       const textWidth = alertEl.scrollWidth;
       const totalDistance = window.innerWidth + textWidth;
-      const speed = 150; // pixels per second
+      const speed = 300; // pixels per second
       alertEl.style.setProperty('--marquee-duration', (totalDistance / speed) + 's');
       alertEl.classList.add('visible');
       bannerEl.classList.add('alert-active');
