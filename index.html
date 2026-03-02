@@ -218,21 +218,23 @@
     }
 
     .change-alert {
-      display: none;
+      position: absolute;
+      left: 0;
       white-space: nowrap;
       font-size: 2.4vh;
       font-weight: 600;
       color: #e74c3c;
+      visibility: hidden;
     }
 
     .change-alert.visible {
-      display: block;
-      animation: marquee var(--marquee-duration, 14s) linear;
+      visibility: visible;
+      animation: marquee var(--marquee-duration, 14s) linear forwards;
     }
 
     @keyframes marquee {
-      0%   { transform: translateX(100vw); }
-      100% { transform: translateX(-100%); }
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(var(--marquee-distance)); }
     }
 
     /* ── Prayer Table ── */
@@ -755,15 +757,17 @@
 
       contentEl.classList.add('hidden');
       alertEl.classList.remove('visible');
-      // Force reflow to restart animation
+      bannerEl.classList.add('alert-active');
+      // Force reflow so scrollWidth is accurate
       void alertEl.offsetWidth;
-      // Scale duration to text length so it fully scrolls off
       const textWidth = alertEl.scrollWidth;
-      const totalDistance = window.innerWidth + textWidth;
-      const speed = 300; // pixels per second
+      const bannerWidth = bannerEl.offsetWidth;
+      // Text needs to move its own width + banner width to fully leave
+      const totalDistance = textWidth + bannerWidth;
+      const speed = 150; // pixels per second
+      alertEl.style.setProperty('--marquee-distance', (-totalDistance) + 'px');
       alertEl.style.setProperty('--marquee-duration', (totalDistance / speed) + 's');
       alertEl.classList.add('visible');
-      bannerEl.classList.add('alert-active');
       bannerShowingAlert = true;
     }
 
