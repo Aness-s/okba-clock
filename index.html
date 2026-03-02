@@ -795,8 +795,8 @@
       if (!bannerAlertActive) {
         bannerAlertActive = true;
         alertEl.addEventListener('animationend', showNextPrayerContent);
-        // Start the first cycle after 8s
-        bannerToggleTimeout = setTimeout(showChangeAlert, 20000);
+        // Show alert immediately on first detection
+        showChangeAlert();
       }
     }
 
