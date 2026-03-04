@@ -1,14 +1,5 @@
 var prayerData = [];
 
-// ── Background theme config ──
-// Options: 'geometric', 'gradient', 'borders'
-var BACKGROUND_THEME = 'borders';
-
-// Apply theme class to body
-(function () {
-  document.body.className = 'theme-' + BACKGROUND_THEME;
-})();
-
 // Polyfill for classList on old browsers
 (function () {
   if (!document.createElement('div').classList) {
