@@ -2,7 +2,7 @@ var prayerData = [];
 
 // ── Background theme config ──
 // Options: 'geometric', 'gradient', 'borders'
-var BACKGROUND_THEME = 'geometric';
+var BACKGROUND_THEME = 'gradient';
 
 // Apply theme class to body
 (function () {
