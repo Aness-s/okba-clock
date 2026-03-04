@@ -32,16 +32,17 @@
     <div class="next-prayer-banner" id="nextPrayerBanner">
       <div class="next-prayer-content" id="nextPrayerContent">
         <span class="label">Next Prayer</span>
-        <span class="prayer-name" id="nextPrayerName">—</span>
-        <span class="countdown" id="nextPrayerCountdown">—</span>
+        <span class="prayer-name" id="nextPrayerName">&mdash;</span>
+        <span class="countdown" id="nextPrayerCountdown">&mdash;</span>
       </div>
       <div class="change-alert" id="changeAlert"></div>
     </div>
 
     <!-- Prayer Grid -->
-    <div class="prayer-grid">
+    <div class="prayer-grid" id="prayerGrid">
       <div class="prayer-grid-header">
         <span>Salah</span>
+        <span>Adhan</span>
         <span>Begins</span>
         <span>Iqamah</span>
       </div>
@@ -56,8 +57,9 @@
             <div class="prayer-name-ar">الفجر</div>
           </div>
         </div>
-        <div><div class="prayer-time" id="fajr-start">—</div></div>
-        <div><div class="prayer-time" id="fajr-iqama">—</div></div>
+        <div><div class="prayer-time" id="fajr-adhan">&mdash;</div></div>
+        <div><div class="prayer-time" id="fajr-start">&mdash;</div></div>
+        <div><div class="prayer-time" id="fajr-iqama">&mdash;</div></div>
       </div>
 
       <div class="prayer-row sunrise-row" id="row-sunrise">
@@ -70,7 +72,7 @@
             <div class="prayer-name-ar">الشروق</div>
           </div>
         </div>
-        <div><div class="prayer-time sunrise-time" id="sunrise-start">—</div></div>
+        <div><div class="prayer-time sunrise-time" id="sunrise-start">&mdash;</div></div>
       </div>
 
       <div class="prayer-row" id="row-dhuhr">
@@ -83,8 +85,9 @@
             <div class="prayer-name-ar">الظهر</div>
           </div>
         </div>
-        <div><div class="prayer-time" id="dhuhr-start">—</div></div>
-        <div><div class="prayer-time" id="dhuhr-iqama">—</div></div>
+        <div><div class="prayer-time" id="dhuhr-adhan">&mdash;</div></div>
+        <div><div class="prayer-time" id="dhuhr-start">&mdash;</div></div>
+        <div><div class="prayer-time" id="dhuhr-iqama">&mdash;</div></div>
       </div>
 
       <div class="prayer-row" id="row-asr">
@@ -97,8 +100,9 @@
             <div class="prayer-name-ar">العصر</div>
           </div>
         </div>
-        <div><div class="prayer-time" id="asr-start">—</div></div>
-        <div><div class="prayer-time" id="asr-iqama">—</div></div>
+        <div><div class="prayer-time" id="asr-adhan">&mdash;</div></div>
+        <div><div class="prayer-time" id="asr-start">&mdash;</div></div>
+        <div><div class="prayer-time" id="asr-iqama">&mdash;</div></div>
       </div>
 
       <div class="prayer-row" id="row-maghrib">
@@ -111,8 +115,9 @@
             <div class="prayer-name-ar">المغرب</div>
           </div>
         </div>
-        <div><div class="prayer-time" id="maghrib-start">—</div></div>
-        <div><div class="prayer-time" id="maghrib-iqama">—</div></div>
+        <div><div class="prayer-time" id="maghrib-adhan">&mdash;</div></div>
+        <div><div class="prayer-time" id="maghrib-start">&mdash;</div></div>
+        <div><div class="prayer-time" id="maghrib-iqama">&mdash;</div></div>
       </div>
 
       <div class="prayer-row" id="row-isha">
@@ -125,8 +130,9 @@
             <div class="prayer-name-ar">العشاء</div>
           </div>
         </div>
-        <div><div class="prayer-time" id="isha-start">—</div></div>
-        <div><div class="prayer-time" id="isha-iqama">—</div></div>
+        <div><div class="prayer-time" id="isha-adhan">&mdash;</div></div>
+        <div><div class="prayer-time" id="isha-start">&mdash;</div></div>
+        <div><div class="prayer-time" id="isha-iqama">&mdash;</div></div>
       </div>
 
       <div class="prayer-row jumuah-row" id="row-jumuah">
@@ -139,10 +145,21 @@
             <div class="prayer-name-ar">الجمعة</div>
           </div>
         </div>
-        <div><div class="prayer-time" id="jumuah-start">—</div></div>
-        <div><div class="prayer-time" id="jumuah-iqama">—</div></div>
+        <div><div class="prayer-time" id="jumuah-adhan">&mdash;</div></div>
+        <div><div class="prayer-time" id="jumuah-start">&mdash;</div></div>
+        <div><div class="prayer-time" id="jumuah-iqama">&mdash;</div></div>
       </div>
     </div>
+
+    <!-- Adhan Overlay -->
+    <div id="adhanOverlay" class="adhan-overlay" style="display:none;">
+      <div class="adhan-overlay-label">Adhan Time</div>
+      <div class="adhan-overlay-name" id="adhanPrayerName"></div>
+      <div class="adhan-overlay-arabic" id="adhanPrayerArabic"></div>
+    </div>
+
+    <!-- Iqama Overlay (blank - just hides content below header) -->
+    <div id="iqamaOverlay" class="iqama-overlay" style="display:none;"></div>
   </div>
 
   <script src="script.js"></script>

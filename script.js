@@ -91,6 +91,22 @@ function formatTime12(timeStr) {
   return hour12 + ':' + pad2(m) + ' ' + ampm;
 }
 
+// Compute adhan time: iqama - 10 minutes, or beginsStr for maghrib
+function computeAdhanTime(iqamaStr, isMaghrib, beginsStr) {
+  if (isMaghrib) return beginsStr;
+  if (!iqamaStr) return null;
+  var parts = iqamaStr.split(':');
+  var h = parseInt(parts[0], 10);
+  var m = parseInt(parts[1], 10);
+  m -= 10;
+  if (m < 0) {
+    m += 60;
+    h -= 1;
+    if (h < 0) h = 23;
+  }
+  return pad2(h) + ':' + pad2(m);
+}
+
 // Parse "HH:MM" to today's Date object
 function parseTimeToday(timeStr) {
   if (!timeStr) return null;
@@ -168,6 +184,23 @@ function updateDisplay() {
     return;
   }
 
+  // Compute adhan times
+  var fajrAdhan = computeAdhanTime(data.fajrIqama, false, null);
+  var dhuhrAdhan = computeAdhanTime(data.zuhrIqama, false, null);
+  var asrAdhan = computeAdhanTime(data.asrIqama, false, null);
+  var maghribAdhan = computeAdhanTime(data.maghribIqama, true, data.maghribStart);
+  var ishaAdhan = computeAdhanTime(data.ishaIqama, false, null);
+  var jumuahAdhan = computeAdhanTime(data.jummah1, false, null);
+
+  // Set adhan times
+  document.getElementById('fajr-adhan').textContent = formatTime12(fajrAdhan);
+  document.getElementById('dhuhr-adhan').textContent = formatTime12(dhuhrAdhan);
+  document.getElementById('asr-adhan').textContent = formatTime12(asrAdhan);
+  document.getElementById('maghrib-adhan').textContent = formatTime12(maghribAdhan);
+  document.getElementById('isha-adhan').textContent = formatTime12(ishaAdhan);
+  document.getElementById('jumuah-adhan').textContent = formatTime12(jumuahAdhan);
+
+  // Set prayer times
   document.getElementById('fajr-start').textContent = formatTime12(data.fajrStart);
   document.getElementById('fajr-iqama').textContent = formatTime12(data.fajrIqama);
   document.getElementById('sunrise-start').textContent = formatTime12(data.sunrise);
@@ -366,12 +399,113 @@ function setupChangeAlert() {
   }
 }
 
+// ── Adhan / Iqama Overlay Logic ──
+
+var currentOverlay = 'none'; // 'none', 'adhan', 'iqama'
+
+var arabicNames = {
+  'Fajr': '\u0627\u0644\u0641\u062C\u0631',
+  'Dhuhr': '\u0627\u0644\u0638\u0647\u0631',
+  'Asr': '\u0627\u0644\u0639\u0635\u0631',
+  'Maghrib': '\u0627\u0644\u0645\u063A\u0631\u0628',
+  'Isha': '\u0627\u0644\u0639\u0634\u0627\u0621'
+};
+
+function showAdhanOverlay(nameEn, nameAr) {
+  if (currentOverlay === 'adhan') return;
+  currentOverlay = 'adhan';
+
+  document.getElementById('adhanPrayerName').textContent = nameEn;
+  document.getElementById('adhanPrayerArabic').textContent = nameAr;
+
+  document.getElementById('nextPrayerBanner').style.display = 'none';
+  document.getElementById('prayerGrid').style.display = 'none';
+  document.getElementById('adhanOverlay').style.display = '';
+  document.getElementById('iqamaOverlay').style.display = 'none';
+}
+
+function showIqamaOverlay() {
+  if (currentOverlay === 'iqama') return;
+  currentOverlay = 'iqama';
+
+  document.getElementById('nextPrayerBanner').style.display = 'none';
+  document.getElementById('prayerGrid').style.display = 'none';
+  document.getElementById('adhanOverlay').style.display = 'none';
+  document.getElementById('iqamaOverlay').style.display = '';
+}
+
+function hideOverlays() {
+  if (currentOverlay === 'none') return;
+  currentOverlay = 'none';
+
+  document.getElementById('nextPrayerBanner').style.display = '';
+  document.getElementById('prayerGrid').style.display = '';
+  document.getElementById('adhanOverlay').style.display = 'none';
+  document.getElementById('iqamaOverlay').style.display = 'none';
+}
+
+function checkAdhanIqama() {
+  var data = getDisplayData();
+  if (!data) return;
+
+  var now = new Date();
+  var nowMs = now.getTime();
+
+  var prayers = [
+    { name: 'Fajr',    iqama: data.fajrIqama,    begins: data.fajrStart,    isMaghrib: false },
+    { name: 'Dhuhr',   iqama: data.zuhrIqama,     begins: data.zuhrStart,    isMaghrib: false },
+    { name: 'Asr',     iqama: data.asrIqama,      begins: data.asrStart,     isMaghrib: false },
+    { name: 'Maghrib', iqama: data.maghribIqama,   begins: data.maghribStart, isMaghrib: true },
+    { name: 'Isha',    iqama: data.ishaIqama,      begins: data.ishaStart,    isMaghrib: false }
+  ];
+
+  var ADHAN_DURATION = 2 * 60 * 1000;  // 2 minutes
+  var IQAMA_DURATION = 8 * 60 * 1000;  // 8 minutes
+
+  // Check iqama first (takes priority)
+  for (var i = 0; i < prayers.length; i++) {
+    var p = prayers[i];
+    var iqamaDate = parseTimeToday(p.iqama);
+    if (iqamaDate) {
+      var iqamaMs = iqamaDate.getTime();
+      if (nowMs >= iqamaMs && nowMs < iqamaMs + IQAMA_DURATION) {
+        showIqamaOverlay();
+        return;
+      }
+    }
+  }
+
+  // Check adhan
+  for (var j = 0; j < prayers.length; j++) {
+    var pr = prayers[j];
+    var adhanStr = computeAdhanTime(pr.iqama, pr.isMaghrib, pr.begins);
+    var adhanDate = parseTimeToday(adhanStr);
+    if (adhanDate) {
+      var adhanMs = adhanDate.getTime();
+      // Adhan window: from adhan time until iqama time (or 2 min, whichever is shorter)
+      var iqamaDate2 = parseTimeToday(pr.iqama);
+      var adhanEnd = iqamaDate2 ? Math.min(adhanMs + ADHAN_DURATION, iqamaDate2.getTime()) : adhanMs + ADHAN_DURATION;
+      if (nowMs >= adhanMs && nowMs < adhanEnd) {
+        var arName = arabicNames[pr.name] || '';
+        showAdhanOverlay(pr.name, arName);
+        return;
+      }
+    }
+  }
+
+  // No active overlay
+  hideOverlays();
+}
+
 // Initial setup
 updateClock();
 updateDate();
 
-// Update clock every second
-setInterval(updateClock, 1000);
+// Update clock and check overlays every second
+setInterval(function () {
+  updateClock();
+  checkAdhanIqama();
+}, 1000);
 
 // Update prayer times and next prayer every 30 seconds
 setInterval(function () {
