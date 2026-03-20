@@ -1,5 +1,38 @@
 var prayerData = [];
 
+// ── Eid Mode ──
+// Set to true to enable the Eid Mubarak theme
+var EID_MODE = false;
+
+(function () {
+  if (!EID_MODE) return;
+
+  // Add eid-theme class to body
+  document.body.className = 'eid-theme';
+
+  // Create Eid banner element
+  var banner = document.createElement('div');
+  banner.className = 'eid-banner';
+  banner.innerHTML = '<div class="eid-banner-inner">' +
+    '<span class="eid-star">&#9733;</span>' +
+    '<span class="eid-text-ar">\u0639\u064A\u062F \u0645\u0628\u0627\u0631\u0643</span>' +
+    '<span class="eid-dot">\u00B7</span>' +
+    '<span class="eid-text-en">Eid Mubarak</span>' +
+    '<span class="eid-star">&#9733;</span>' +
+    '</div>';
+
+  // Insert after header (before divider)
+  var container = document.querySelector('.container');
+  var header = document.querySelector('.header');
+  if (container && header && header.nextSibling) {
+    container.insertBefore(banner, header.nextSibling);
+  }
+
+  // Hide the next prayer banner to free up space
+  var nextBanner = document.getElementById('nextPrayerBanner');
+  if (nextBanner) nextBanner.style.display = 'none';
+})();
+
 // Polyfill for classList on old browsers
 (function () {
   if (!document.createElement('div').classList) {

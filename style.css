@@ -65,8 +65,8 @@ body {
   border: 1px solid rgba(255,255,255,0.15);
   color: rgba(240,236,228,0.6);
   border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 1.4vh;
+  padding: 4px 7px;
+  font-size: 1.8vh;
   cursor: pointer;
   opacity: 0.4;
   -webkit-transition: opacity 0.2s;
@@ -505,4 +505,299 @@ body {
   -webkit-box-flex: 1;
   -webkit-flex: 1;
   flex: 1;
+}
+
+/* ══════════════════════════════════════════
+   Eid Mubarak Theme
+   ══════════════════════════════════════════ */
+
+/* Warm background shift */
+body.eid-theme {
+  background: #0c1a2e;
+}
+
+/* Festive golden ambient glow */
+body.eid-theme::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(201,168,76,0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 80%, rgba(201,168,76,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.06) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(201,168,76,0.06) 0%, transparent 40%);
+}
+
+/* Corner ornaments — top-left and top-right */
+body.eid-theme .container::before,
+body.eid-theme .container::after {
+  content: '';
+  position: fixed;
+  width: 5vw;
+  height: 5vw;
+  border-color: rgba(201,168,76,0.35);
+  border-style: solid;
+  border-width: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+body.eid-theme .container::before {
+  top: 1.5vh;
+  left: 2vw;
+  border-top-width: 2px;
+  border-left-width: 2px;
+}
+body.eid-theme .container::after {
+  top: 1.5vh;
+  right: 2vw;
+  border-top-width: 2px;
+  border-right-width: 2px;
+}
+
+/* ── Eid Greeting Banner ── */
+.eid-banner {
+  -webkit-flex-shrink: 0;
+  flex-shrink: 0;
+  text-align: center;
+  padding: 2vh 2vw;
+  background: -webkit-linear-gradient(left, transparent, rgba(201,168,76,0.12) 20%, rgba(201,168,76,0.22) 50%, rgba(201,168,76,0.12) 80%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.12) 20%, rgba(201,168,76,0.22) 50%, rgba(201,168,76,0.12) 80%, transparent);
+  border-top: 1px solid rgba(201,168,76,0.3);
+  border-bottom: 1px solid rgba(201,168,76,0.3);
+  position: relative;
+  overflow: hidden;
+  -webkit-animation: eidBreathe 6s ease-in-out infinite;
+  animation: eidBreathe 6s ease-in-out infinite;
+}
+
+/* Gentle breathing scale + glow on the banner */
+@-webkit-keyframes eidBreathe {
+  0%, 100% {
+    -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+    -webkit-box-shadow: 0 0 15px rgba(201,168,76,0.03), inset 0 0 20px rgba(201,168,76,0.02);
+    box-shadow: 0 0 15px rgba(201,168,76,0.03), inset 0 0 20px rgba(201,168,76,0.02);
+    border-color: rgba(201,168,76,0.25);
+  }
+  50% {
+    -webkit-transform: scaleX(1.005);
+    transform: scaleX(1.005);
+    -webkit-box-shadow: 0 0 50px rgba(201,168,76,0.12), inset 0 0 40px rgba(201,168,76,0.06);
+    box-shadow: 0 0 50px rgba(201,168,76,0.12), inset 0 0 40px rgba(201,168,76,0.06);
+    border-color: rgba(201,168,76,0.5);
+  }
+}
+@keyframes eidBreathe {
+  0%, 100% {
+    -webkit-transform: scaleX(1);
+    transform: scaleX(1);
+    -webkit-box-shadow: 0 0 15px rgba(201,168,76,0.03), inset 0 0 20px rgba(201,168,76,0.02);
+    box-shadow: 0 0 15px rgba(201,168,76,0.03), inset 0 0 20px rgba(201,168,76,0.02);
+    border-color: rgba(201,168,76,0.25);
+  }
+  50% {
+    -webkit-transform: scaleX(1.005);
+    transform: scaleX(1.005);
+    -webkit-box-shadow: 0 0 50px rgba(201,168,76,0.12), inset 0 0 40px rgba(201,168,76,0.06);
+    box-shadow: 0 0 50px rgba(201,168,76,0.12), inset 0 0 40px rgba(201,168,76,0.06);
+    border-color: rgba(201,168,76,0.5);
+  }
+}
+
+/* Slow light bloom that drifts across the banner */
+@-webkit-keyframes eidBloom {
+  0% { left: -20%; top: -50%; opacity: 0; }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.7; }
+  100% { left: 120%; top: -50%; opacity: 0; }
+}
+@keyframes eidBloom {
+  0% { left: -20%; top: -50%; opacity: 0; }
+  20% { opacity: 0.7; }
+  80% { opacity: 0.7; }
+  100% { left: 120%; top: -50%; opacity: 0; }
+}
+
+/* Star slow spin + green/gold flash */
+@-webkit-keyframes starSpin {
+  0%   { -webkit-transform: rotate(0deg) scale(0.9); transform: rotate(0deg) scale(0.9); color: #c9a84c; opacity: 0.8; }
+  25%  { -webkit-transform: rotate(90deg) scale(1.15); transform: rotate(90deg) scale(1.15); color: #5dba7d; opacity: 1; }
+  50%  { -webkit-transform: rotate(180deg) scale(0.9); transform: rotate(180deg) scale(0.9); color: #c9a84c; opacity: 0.8; }
+  75%  { -webkit-transform: rotate(270deg) scale(1.1); transform: rotate(270deg) scale(1.1); color: #5dba7d; opacity: 1; }
+  100% { -webkit-transform: rotate(360deg) scale(0.9); transform: rotate(360deg) scale(0.9); color: #c9a84c; opacity: 0.8; }
+}
+@keyframes starSpin {
+  0%   { -webkit-transform: rotate(0deg) scale(0.9); transform: rotate(0deg) scale(0.9); color: #c9a84c; opacity: 0.8; }
+  25%  { -webkit-transform: rotate(90deg) scale(1.15); transform: rotate(90deg) scale(1.15); color: #5dba7d; opacity: 1; }
+  50%  { -webkit-transform: rotate(180deg) scale(0.9); transform: rotate(180deg) scale(0.9); color: #c9a84c; opacity: 0.8; }
+  75%  { -webkit-transform: rotate(270deg) scale(1.1); transform: rotate(270deg) scale(1.1); color: #5dba7d; opacity: 1; }
+  100% { -webkit-transform: rotate(360deg) scale(0.9); transform: rotate(360deg) scale(0.9); color: #c9a84c; opacity: 0.8; }
+}
+
+/* English text: letter-spacing breathe + color shift */
+@-webkit-keyframes textBreathe {
+  0%, 100% {
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 8px rgba(201,168,76,0.15);
+    color: #5dba7d;
+  }
+  50% {
+    letter-spacing: 0.25em;
+    text-shadow: 0 0 30px rgba(93,186,125,0.4), 0 0 60px rgba(93,186,125,0.15);
+    color: #7dd49a;
+  }
+}
+@keyframes textBreathe {
+  0%, 100% {
+    letter-spacing: 0.12em;
+    text-shadow: 0 0 8px rgba(201,168,76,0.15);
+    color: #5dba7d;
+  }
+  50% {
+    letter-spacing: 0.25em;
+    text-shadow: 0 0 30px rgba(93,186,125,0.4), 0 0 60px rgba(93,186,125,0.15);
+    color: #7dd49a;
+  }
+}
+
+/* Arabic text: gentle glow pulse + subtle scale */
+@-webkit-keyframes arTextPulse {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(93,186,125,0.15);
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 25px rgba(93,186,125,0.4), 0 0 50px rgba(93,186,125,0.15);
+    -webkit-transform: scale(1.03);
+    transform: scale(1.03);
+  }
+}
+@keyframes arTextPulse {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(93,186,125,0.15);
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 0 0 25px rgba(93,186,125,0.4), 0 0 50px rgba(93,186,125,0.15);
+    -webkit-transform: scale(1.03);
+    transform: scale(1.03);
+  }
+}
+
+/* Dot separator pulse */
+@-webkit-keyframes dotPulse {
+  0%, 100% { opacity: 0.3; -webkit-transform: scale(1); transform: scale(1); }
+  50% { opacity: 0.8; -webkit-transform: scale(1.4); transform: scale(1.4); }
+}
+@keyframes dotPulse {
+  0%, 100% { opacity: 0.3; -webkit-transform: scale(1); transform: scale(1); }
+  50% { opacity: 0.8; -webkit-transform: scale(1.4); transform: scale(1.4); }
+}
+
+/* Soft bloom light that drifts across */
+.eid-banner::before {
+  content: '';
+  position: absolute;
+  width: 25%;
+  height: 200%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(201,168,76,0.15) 0%, rgba(201,168,76,0.05) 40%, transparent 70%);
+  -webkit-animation: eidBloom 8s ease-in-out infinite;
+  animation: eidBloom 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Second bloom, delayed and slower */
+.eid-banner::after {
+  content: '';
+  position: absolute;
+  width: 18%;
+  height: 200%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 40%, transparent 70%);
+  -webkit-animation: eidBloom 12s ease-in-out 4s infinite;
+  animation: eidBloom 12s ease-in-out 4s infinite;
+  pointer-events: none;
+}
+
+.eid-banner-inner {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.eid-text-en {
+  font-size: 5vh;
+  font-weight: 700;
+  color: #5dba7d;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  -webkit-animation: textBreathe 5s ease-in-out infinite;
+  animation: textBreathe 5s ease-in-out infinite;
+}
+
+.eid-text-ar {
+  font-family: 'Amiri', serif;
+  font-size: 6vh;
+  font-weight: 700;
+  color: #5dba7d;
+  display: inline-block;
+  -webkit-animation: arTextPulse 4s ease-in-out infinite;
+  animation: arTextPulse 4s ease-in-out infinite;
+}
+
+.eid-dot {
+  font-size: 3vh;
+  color: rgba(201,168,76,0.5);
+  margin-left: 1.5vw;
+  margin-right: 1.5vw;
+  display: inline-block;
+  -webkit-animation: dotPulse 3s ease-in-out infinite;
+  animation: dotPulse 3s ease-in-out infinite;
+}
+
+.eid-star {
+  font-size: 4.5vh;
+  color: #c9a84c;
+  margin-left: 1.5vw;
+  margin-right: 1.5vw;
+  display: inline-block;
+  -webkit-animation: starSpin 8s linear infinite;
+  animation: starSpin 8s linear infinite;
+}
+
+.eid-star:last-child {
+  -webkit-animation-direction: reverse;
+}
+
+/* Subtle glow on prayer rows for festive feel */
+body.eid-theme .prayer-row {
+  border-color: rgba(201,168,76,0.1);
+}
+
+body.eid-theme .prayer-row.active {
+  border-color: rgba(201,168,76,0.6);
+  -webkit-box-shadow: 0 0 25px rgba(201,168,76,0.12);
+  box-shadow: 0 0 25px rgba(201,168,76,0.12);
+}
+
+/* Gold-tinted divider */
+body.eid-theme .divider {
+  background: -webkit-linear-gradient(left, transparent, rgba(201,168,76,0.4), transparent);
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.4), transparent);
 }
