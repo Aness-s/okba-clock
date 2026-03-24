@@ -2,7 +2,7 @@ var prayerData = [];
 
 // ── Eid Mode ──
 // Set to true to enable the Eid Mubarak theme
-var EID_MODE = true;
+var EID_MODE = false;
 
 (function () {
   if (!EID_MODE) return;
